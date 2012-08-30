@@ -29,6 +29,6 @@ lein run
 
 ## License
 
-Copyright © 2012 xumingming
+Copyright © 2012 [xumingming](https://github.com/xumingming)
 
 Distributed under the Eclipse Public License, the same as Clojure.
