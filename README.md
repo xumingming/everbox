@@ -13,6 +13,14 @@ favorite editor(Emacs!!), and it also auto-sync your changes to evernote server
 
 It is still under developing.
 
+## Config
+
+You need to put the following config in `~/.everbox.yaml`
+```yaml
+dev-token: "your-evernote-developer-token"
+user-store-url: "https://sandbox.evernote.com/edam/user"
+everbox-root: "/path/to/store/your/evernote"
+```
 ## Usage
 
 ```bash
