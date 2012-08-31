@@ -22,11 +22,13 @@ lein run
 ```
 ## FAQ
 ### Why there is a folder named maven_repo?
-  http://www.pgrs.net/2011/10/30/using-local-jars-with-leiningen/
+    http://www.pgrs.net/2011/10/30/using-local-jars-with-leiningen/
 
 ### Why not using the standard version of thrift?
-   http://discussion.evernote.com/topic/27805-evernote-libthrift
+    http://discussion.evernote.com/topic/27805-evernote-libthrift
 
+### How to get an evernote developer token?
+    https://sandbox.evernote.com/api/DeveloperToken.action
 ## License
 
 Copyright © 2012 [xumingming](https://github.com/xumingming)
