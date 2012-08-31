@@ -39,6 +39,6 @@ lein run
     https://sandbox.evernote.com/api/DeveloperToken.action
 ## License
 
-Copyright © 2012 [xumingming](https://github.com/xumingming)
+Copyright © 2012 [@xumingming](https://github.com/xumingming)
 
 Distributed under the Eclipse Public License, the same as Clojure.
