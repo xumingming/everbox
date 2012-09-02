@@ -35,6 +35,11 @@
 (defn get-note-path [notebook-name note-name]
   (str (get-notebook-path notebook-name) "/" note-name))
 
+(defn get-local-note-content [notebook-name note-name]
+  (let [note-path (get-note-path notebook-name note-name)
+        note-content (slurp note-path)]
+    note-content))
+
 (defn get-note-local-updated-at [notebook-name note-name]
   (.lastModified (File. (get-note-path notebook-name note-name))))
 
@@ -52,13 +57,13 @@
 (defn compute-need-to-create-notes [metadata notebook]
   (let [local-notes (list-local-notes (:name notebook))
         cache-notes (list-cache-notes metadata (:guid notebook))
-        need-to-create-notes (set/difference local-notes cache-notes)]
+        need-to-create-notes (set/difference (set local-notes) (set cache-notes))]
     need-to-create-notes))
 
 (defn compute-need-to-delete-notes [metadata notebook]
   (let [local-notes (list-local-notes (:name notebook))
         cache-notes (list-cache-notes metadata (:guid notebook))
-        need-to-delete-notes (set/difference cache-notes local-notes)]
+        need-to-delete-notes (set/difference (set cache-notes) (set local-notes))]
     need-to-delete-notes))
 
 (defn get-cached-notes-by-names [metadata notebook-guid names]
@@ -107,8 +112,7 @@
         need-to-create-notes (compute-need-to-create-notes notebooks notebook)]
     (with-note-store [note-store]
       (doseq [note-name need-to-create-notes
-              :let [note-path (get-note-path notebook-name note-name)
-                    note-content (slurp note-path)
+              :let [note-content (get-local-note-content notebook-name note-name)
                     note (create-note note-store note-name note-content)]]
         ;; update the metadata
         (swap! notebooks assoc-in [notebook-guid :notes (:guid note)] note)))))
@@ -117,13 +121,12 @@
   (let [notebook-name (:name notebook)
         notebook-guid (:guid notebook)
         need-to-delete-notes (compute-need-to-delete-notes notebooks notebook)
-        need-to-delete-notes (get-cached-notes-by-names need-to-delete-notes)]
+        need-to-delete-notes (get-cached-notes-by-names notebooks notebook-guid need-to-delete-notes)]
     (with-note-store [note-store]
       (doseq [note need-to-delete-notes
               :let [note-name (:name note)
                     note-guid (:guid note)
-                    note-path (get-note-path notebook-name note-name)
-                    note-content (slurp note-path)
+                    note-content (get-local-note-content notebook-name note-name)
                     note (delete-note note-store note-guid)]]
         ;; TODO update the metadata
         (swap! notebooks assoc-in [notebook-guid :notes (:guid note)] note)))))
@@ -131,21 +134,24 @@
 (defn handle-notes-updates [notebooks notebook]
   (let [notebook-name (:name notebook)
         notebook-guid (:guid notebook)]
+    (log-message "notebooks: " notebooks)
+    (log-message "notebook: " notebook)
     (doseq [[note-guid note] (:notes notebook)
             :let [note-name (:title note)
                   note-updated-at (:updated-at note)
-                  note-local-updated-at (get-note-local-updated-at notebook-name note-name)
-                  note-path (get-note-path notebook-name note-name)]]
+                  note-local-updated-at (get-note-local-updated-at notebook-name note-name)]]
       ;; note updated
       (when-not (= note-updated-at note-local-updated-at)
-        (log-message "note: " note-path " changed! origin:" (Date. note-updated-at)
+        (log-message "origin: " note-updated-at ", new: " note-local-updated-at)
+        (log-message "note: " note-name " changed! origin:" (Date. note-updated-at)
                      ", new: " (Date. note-local-updated-at))
         ;; update note
         (with-note-store [note-store]
-          (update-note note-store (assoc note :content (slurp note-path))))
+          (update-note note-store (assoc note :content (get-local-note-content notebook-name note-name))))
         ;; upate the metadata
         (swap! notebooks assoc-in [notebook-guid :notes note-guid :updated-at] note-local-updated-at)
-        ))))
+        (swap! notebooks assoc-in [notebook-guid :notes note-guid :content]
+               (get-local-note-content notebook-name note-name))))))
 
 (defn local-sync []
   (while true
@@ -154,12 +160,14 @@
       (doseq [[notebook-guid notebook] @notebooks
               :let [notebook-name (:name notebook)]]
         ;; handle notes creation
+        (log-message "Checking CREATING")
         (handle-notes-creation notebooks notebook)
         
         ;; TODO handle notes deletion
-        (handle-notes-deletion notebooks notebook)
+        ;;(handle-notes-deletion notebooks notebook)
         
         ;; handle notes updates
+        (log-message "Checking UPDATING")        
         (handle-notes-updates notebooks notebook))
       (update-cache-metadata @notebooks))
     ;; TODO make the sync interval configable
