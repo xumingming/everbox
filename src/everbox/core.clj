@@ -70,10 +70,10 @@
   `(let [~note-store-sym (get-note-store ~USER-STORE-URL ~DEV-TOKEN)]
      ~@body))
 
-(defn update-metadata [metadata]
+(defn update-cache-metadata [metadata]
   (spit METADATA-FILE-PATH (str metadata)))
 
-(defn read-metadata []
+(defn read-cache-metadata []
   (atom (read-string (slurp METADATA-FILE-PATH))))
 
 (defn setup []
@@ -99,7 +99,7 @@
             (log-message "Creating file: " note-path)
             (spit note-path note-content)
             (mkfile note-path (:updated-at note)))))
-      (update-metadata @notebooks-atom))))
+      (update-cache-metadata @notebooks-atom))))
 
 (defn handle-notes-creation [notebooks notebook]
   (let [notebook-name (:name notebook)
@@ -150,7 +150,7 @@
 (defn local-sync []
   (while true
     (log-message "Checking...")
-    (let [notebooks (read-metadata)]
+    (let [notebooks (read-cache-metadata)]
       (doseq [[notebook-guid notebook] @notebooks
               :let [notebook-name (:name notebook)]]
         ;; handle notes creation
@@ -161,7 +161,7 @@
         
         ;; handle notes updates
         (handle-notes-updates notebooks notebook))
-      (update-metadata @notebooks))
+      (update-cache-metadata @notebooks))
     ;; TODO make the sync interval configable
     (Thread/sleep 5000)))
 
