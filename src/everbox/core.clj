@@ -134,20 +134,19 @@
 (defn handle-notes-updates [notebooks notebook]
   (let [notebook-name (:name notebook)
         notebook-guid (:guid notebook)]
-    (log-message "notebooks: " notebooks)
-    (log-message "notebook: " notebook)
     (doseq [[note-guid note] (:notes notebook)
             :let [note-name (:title note)
                   note-updated-at (:updated-at note)
+                  note-path (get-note-path notebook-name note-name)
                   note-local-updated-at (get-note-local-updated-at notebook-name note-name)]]
       ;; note updated
       (when-not (= note-updated-at note-local-updated-at)
-        (log-message "origin: " note-updated-at ", new: " note-local-updated-at)
-        (log-message "note: " note-name " changed! origin:" (Date. note-updated-at)
-                     ", new: " (Date. note-local-updated-at))
+        (log-message "note: " note-path " changed!")
         ;; update note
         (with-note-store [note-store]
-          (update-note note-store (assoc note :content (get-local-note-content notebook-name note-name))))
+          (log-message "Uploading changed note: " note-path)
+          (update-note note-store (assoc note :content (get-local-note-content notebook-name note-name)))
+          (log-message "Uploaded changed note: " note-path))
         ;; upate the metadata
         (swap! notebooks assoc-in [notebook-guid :notes note-guid :updated-at] note-local-updated-at)
         (swap! notebooks assoc-in [notebook-guid :notes note-guid :content]
@@ -160,14 +159,13 @@
       (doseq [[notebook-guid notebook] @notebooks
               :let [notebook-name (:name notebook)]]
         ;; handle notes creation
-        (log-message "Checking CREATING")
-        (handle-notes-creation notebooks notebook)
+        ;;(log-message "Checking CREATING")
+        ;;(handle-notes-creation notebooks notebook)
         
         ;; TODO handle notes deletion
         ;;(handle-notes-deletion notebooks notebook)
         
         ;; handle notes updates
-        (log-message "Checking UPDATING")        
         (handle-notes-updates notebooks notebook))
       (update-cache-metadata @notebooks))
     ;; TODO make the sync interval configable

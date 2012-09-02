@@ -19,8 +19,6 @@
       (let [nb (@notebooks "notebook1")
             updated-note ((:notes nb) "note1")]
         (is (= 2000 (:updated-at updated-note)))
-        (is (= "updated-content" (:content updated-note)))      )
-
-
+        (is (= "updated-content" (:content updated-note))))
       (println @notebooks))))
 
