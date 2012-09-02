@@ -26,7 +26,8 @@ everbox-root: "/path/to/store/your/evernote"
 ```bash
 git checkout git@github.com:xumingming/everbox.git
 cd everbox
-lein run
+lein run setup # fetch the content from evernote for the first time
+lein run sync  # monitor the local changes
 ```
 ## FAQ
 ### Why there is a folder named maven_repo?
