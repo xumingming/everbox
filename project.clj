@@ -9,7 +9,8 @@
                  [evernote/thrift "1.0"]
                  [clj-yaml "0.4.0"]
                  [org.clojure/tools.logging "0.2.3"]
-                 [log4j/log4j "1.2.16"]]
+                 [log4j/log4j "1.2.16"]
+                 [com.google.guava/guava "12.0.1"]]
   :repositories {"local" ~(str (.toURI (java.io.File. "maven_repo")))}
   :warn-on-reflection true
   :main everbox.core)
