@@ -1,5 +1,5 @@
 (ns everbox.core
-  (:use [everbox.evernote])
+  (:use [evernote.core])
   (:use [everbox.log])  
   (:require [clj-yaml.core :as yaml])
   (:import [java.io File])
