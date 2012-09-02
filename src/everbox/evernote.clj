@@ -7,7 +7,7 @@
   (:import [com.evernote.edam.type Note Notebook])
   (:import [com.evernote.edam.error EDAMUserException]))
 
-(declare java->clj get-user-store get-note-store find-notes)
+(declare java->clj clj->java get-user-store get-note-store find-notes)
 
 (defn create-notebook
   "Creates a notebook with the specified name."
@@ -67,7 +67,7 @@
   "Updates a specified note."
   {:added "0.1"}
   [note-store note]
-  (let []
+  (let [note (clj->java note)]
     (.updateNote (:store note-store) (:dev-token note-store) note)))
 
 (defn delete-note
@@ -109,6 +109,17 @@
    :update-seq-num (.getUpdateSequenceNum note)
    :notebook-guid (.getNotebookGuid note)})
 
+
+(defn clj->java
+  [note]
+  (doto (Note.)
+    (.setGuid (:guid note))
+    (.setTitle (:title note))
+    (.setContent (:content note))
+    (.setContentLength (:content-length note))
+    (.setUpdated (:updated-at note))
+    (.setNotebookGuid (:notebook-guid note))))
+    
 (defn get-user-store [user-store-url]
   (let [http-client (THttpClient. user-store-url)
         user-store-prot (TBinaryProtocol. http-client)
