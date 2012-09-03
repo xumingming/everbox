@@ -51,7 +51,7 @@
 
 (defn list-cache-notes [metadata notebook-guid]
   (let [cache-notes (get-in @metadata [notebook-guid :notes])
-        cache-notes (map #(:name %) cache-notes)]
+        cache-notes (map #(:title (val %)) cache-notes)]
     cache-notes))
 
 (defn compute-need-to-create-notes [metadata notebook]
@@ -160,7 +160,7 @@
               :let [notebook-name (:name notebook)]]
         ;; handle notes creation
         ;;(log-message "Checking CREATING")
-        ;;(handle-notes-creation notebooks notebook)
+        (handle-notes-creation notebooks notebook)
         
         ;; TODO handle notes deletion
         ;;(handle-notes-deletion notebooks notebook)
