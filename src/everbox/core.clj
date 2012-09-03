@@ -106,6 +106,10 @@
             (mkfile note-path (:updated-at note)))))
       (update-cache-metadata @notebooks-atom))))
 
+(defn update-file-last-modified [file-path last-modified]
+  (let [file (File. file-path)]
+    (.setLastModified file last-modified)))
+
 (defn handle-notes-creation [notebooks notebook]
   (let [notebook-name (:name notebook)
         notebook-guid (:guid notebook)
@@ -113,9 +117,11 @@
     (with-note-store [note-store]
       (doseq [note-name need-to-create-notes
               :let [note-content (get-local-note-content notebook-name note-name)
-                    note (create-note note-store note-name note-content)]]
+                    note (create-note note-store note-name note-content)
+                    note-path (get-note-path notebook-name note-name)]]
         ;; update the metadata
-        (swap! notebooks assoc-in [notebook-guid :notes (:guid note)] note)))))
+        (swap! notebooks assoc-in [notebook-guid :notes (:guid note)] note)
+        (update-file-last-modified note-path (:updated-at note))))))
 
 (defn handle-notes-deletion [notebooks notebook]
   (let [notebook-name (:name notebook)
@@ -144,6 +150,7 @@
         (log-message "note: " note-path " changed!")
         ;; update note
         (with-note-store [note-store]
+          (log-message "before: " note-updated-at ",after:" note-local-updated-at)
           (log-message "Uploading changed note: " note-path)
           (update-note note-store (assoc note :content (get-local-note-content notebook-name note-name)))
           (log-message "Uploaded changed note: " note-path))
