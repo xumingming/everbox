@@ -46,9 +46,13 @@ lein run sync  # monitor the local changes
 
 ### How to get an evernote developer token?
 for sandbox:
+```html
     https://sandbox.evernote.com/api/DeveloperToken.action
+```
 for production:
+```html
     https://www.evernote.com/api/DeveloperToken.action
+```
 
 ## License
 
