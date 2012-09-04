@@ -15,16 +15,24 @@ It is still under developing.
 
 ## Config
 
-You need to put the following config in `~/.everbox.yaml`
+You need to put the following config in `~/.everbox/everbox.yaml`
+Sandbox:
 ```yaml
-dev-token: "your-evernote-developer-token"
+dev-token: "your-sandbox-developer-token"
 user-store-url: "https://sandbox.evernote.com/edam/user"
 everbox-root: "/path/to/store/your/evernote"
 ```
+Production:
+```yaml
+dev-token: "your-production-developer-token"
+user-store-url: "https://www.evernote.com/edam/user"
+everbox-root: "/path/to/store/your/evernote"
+```
+
 ## Usage
 
 ```bash
-git checkout git@github.com:xumingming/everbox.git
+git checkout https://github.com/xumingming/everbox.git
 cd everbox
 lein run setup # fetch the content from evernote for the first time
 lein run sync  # monitor the local changes
@@ -37,7 +45,11 @@ lein run sync  # monitor the local changes
     http://discussion.evernote.com/topic/27805-evernote-libthrift
 
 ### How to get an evernote developer token?
+for sandbox:
     https://sandbox.evernote.com/api/DeveloperToken.action
+for production:
+    https://www.evernote.com/api/DeveloperToken.action
+
 ## License
 
 Copyright © 2012 [@xumingming](https://github.com/xumingming)
