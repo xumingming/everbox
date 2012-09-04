@@ -57,7 +57,8 @@
 (defn compute-need-to-create-notes [metadata notebook]
   (let [local-notes (list-local-notes (:name notebook))
         cache-notes (list-cache-notes metadata (:guid notebook))
-        need-to-create-notes (set/difference (set local-notes) (set cache-notes))]
+        need-to-create-notes (set/difference (set local-notes) (set cache-notes))
+        need-to-create-notes (filter #(< (.indexOf % "#") 0) need-to-create-notes)]
     need-to-create-notes))
 
 (defn compute-need-to-delete-notes [metadata notebook]
